@@ -944,7 +944,7 @@ class Terminal(Gtk.VBox):
             middle_click = [self.popup_menu, (widget, event)]
             right_click = [self.paste_clipboard, (not self.config['putty_paste_style_source_clipboard'], )]
         else:
-            middle_click = [self.paste_clipboard, (True, )]
+            middle_click = [self.paste_clipboard if self.config['middle_click_paste'] else lambda x : None, (True, )]
             right_click = [self.popup_menu, (widget, event)]
 
         # Ctrl-click event here.

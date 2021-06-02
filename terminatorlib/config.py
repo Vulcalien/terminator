@@ -122,6 +122,7 @@ DEFAULTS = {
             'putty_paste_style_source_clipboard': False,
             'smart_copy'            : True,
             'clear_select_on_copy'  : False,
+            'middle_click_paste'    : True,
             'line_height'           : 1.0,
             'case_sensitive'        : True,
             'invert_search'         : False,
