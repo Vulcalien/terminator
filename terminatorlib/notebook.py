@@ -37,10 +37,9 @@ class Notebook(Container, Gtk.Notebook):
         self.register_signals(Notebook)
         self.connect('switch-page', self.deferred_on_tab_switch)
         self.connect('scroll-event', self.on_scroll_event)
+        self.connect('page-removed', self.on_page_removed)
         self.connect('create-window', self.create_window_detach)
         self.configure()
-
-        self.set_can_focus(False)
 
         child = window.get_child()
         window.remove(child)
@@ -61,6 +60,8 @@ class Notebook(Container, Gtk.Notebook):
         #self.connect('page-reordered', self.on_page_reordered)
         self.set_scrollable(self.config['scroll_tabbar'])
 
+        self.set_can_focus(False)
+
         if self.config['tab_position'] == 'hidden' or self.config['hide_tabbar']:
             self.set_show_tabs(False)
         else:
@@ -78,6 +79,12 @@ class Notebook(Container, Gtk.Notebook):
 #        self.modify_style(style)
         self.last_active_term = {}
 
+    def on_page_removed(self, notebook, widget, page_num):
+        """Handle page-removed signal"""
+        self.disconnect_child(widget)
+        if self.get_parent() is not None:
+            self.hoover()
+
     def create_window_detach(self, notebook, widget, x, y):
         """Create a window to contain a detached tab"""
         dbg('creating window for detached tab: %s' % widget)
@@ -89,8 +96,6 @@ class Notebook(Container, Gtk.Notebook):
         window.resize(size.width, size.height)
 
         self.detach_tab(widget)
-        self.disconnect_child(widget)
-        self.hoover()
         window.add(widget)
 
         window.show_all()
@@ -227,7 +232,6 @@ class Notebook(Container, Gtk.Notebook):
                     (widget, widget.get_parent()))
             return(False)
         self.remove_page(page_num)
-        self.disconnect_child(widget)
         return(True)
 
     def replace(self, oldwidget, newwidget):
@@ -346,7 +350,6 @@ class Notebook(Container, Gtk.Notebook):
         dbg('Notebook::wrapcloseterm: called on %s' % widget)
         if self.closeterm(widget):
             dbg('Notebook::wrapcloseterm: closeterm succeeded')
-            self.hoover()
         else:
             dbg('Notebook::wrapcloseterm: closeterm failed')
 
